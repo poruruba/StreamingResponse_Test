@@ -1,0 +1,9 @@
+paths:
+  /bedrock-generate:
+    get:
+      x-functype: stream
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
