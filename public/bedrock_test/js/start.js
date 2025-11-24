@@ -39,7 +39,7 @@ var vue_options = {
                 try{
                     const obj = JSON.parse(value);
                     if( obj.contentBlockDelta )
-                        this.response += obj.contentBlockDelta?.delta.text;
+                        this.response += obj.contentBlockDelta.delta?.text;
                 }catch(err){
                     console.error(err);
                 }
