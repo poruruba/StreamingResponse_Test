@@ -106,8 +106,6 @@ async function do_http(input){
 
     if( response_type == "raw" )
       return response;
-    else if( response_type == "reader" )
-      return response.body.getReader();
     else if( response_type == "json" )
       return response.json();
     else if( response_type == 'blob')

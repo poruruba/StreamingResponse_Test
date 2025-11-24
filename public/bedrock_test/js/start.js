@@ -21,38 +21,31 @@ var vue_options = {
             this.response = '';
             var input = {
                 url: base_url + "/bedrock-generate",
-                response_type: "reader",
+                response_type: "raw",
                 method: "GET"
             };
-            var reader = await do_http(input);
-            console.log(reader);
+            var response = await do_http(input);
+            console.log(response);
+            
+            const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
 
-            const decoder = new TextDecoder();
-            let buffer = '';
+            var lineReader = new LineStreamReader(reader);
 
             const readChunk = ({ done, value } ) =>{
                 if( done ){
                     this.toast_show("読み込み完了");
                     return;
                 }
-                console.log(decoder.decode(value));
-
-                buffer += decoder.decode(value, { stream: true });
-                let lines = buffer.split('\n');
-                buffer = lines.pop();
-
-                for (const line of lines) {
-                    try{
-                        if (line.trim()){
-                            const obj = JSON.parse(line);
-                            if( obj.contentBlockDelta )
-                                this.response += obj.contentBlockDelta?.delta.text;
-                        }
-                    }catch(e){}
+                try{
+                    const obj = JSON.parse(value);
+                    if( obj.contentBlockDelta )
+                        this.response += obj.contentBlockDelta?.delta.text;
+                }catch(err){
+                    console.error(err);
                 }
-                reader.read().then(readChunk);            
+                lineReader.read().then(readChunk);            
             };
-            reader.read().then(readChunk);            
+            lineReader.read().then(readChunk);            
         },
     },
     created: function(){
